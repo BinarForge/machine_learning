@@ -23,12 +23,12 @@ for(let r=0; r<data.length; r++){
   for(let c=1; c<headers.length; c++){
     let columnName = headers[c];
 
-    let mappedValue = mappings[columnName].to(dataRow[c]);
+    let mappedValue = mappings[columnName].toPercentage(dataRow[c]);
     
     trainingSet.push( mappedValue );
   }
 
-  training.push({input: trainingSet, output: [mappings['Price'].to(parseFloat(dataRow[0]))]});
+  training.push({input: trainingSet, output: [mappings['Price'].toPercentage(parseFloat(dataRow[0]))]});
 }
 
 // = end of training using 'real' data transformed into Neural Network friendly values
@@ -60,13 +60,13 @@ if(input.length < Object.keys(mappings).length - 1)
 
 for(i=1; i<headers.length; i++){  
   let columnName = headers[i];
-  input[i] = mappings[columnName].to(input[i]);
+  input[i] = mappings[columnName].toPercentage(input[i]);
 }
 
 input.shift(); // get rid off remaining command line argument
 
 let result = network.activate(input);
-result = mappings['Price'].from(result);
+result = mappings['Price'].fromPercentage(result);
 
 console.log('');
 console.log('Your car is worth £' + parseInt(result));

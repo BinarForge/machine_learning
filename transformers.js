@@ -3,13 +3,13 @@ module.exports = {
         const len = (max-min);
 
         return {
-            to: function(value){
+            toPercentage: function(value){
                 if(len === 0)
                     return 0;
 
                 return (min/len + value/len);
             },
-            from: function(value){
+            fromPercentage: function(value){
                 return min*value + len*value;
             }
         }
@@ -19,14 +19,14 @@ module.exports = {
         const len = (max-min);
 
         return {
-            to: function(value){
+            toPercentage: function(value){
                 value = mappings[value.toLowerCase()];
                 if(value === 0)
                     return 0;
 
                 return (min/len + value/len);
             },
-            from: function(value){
+            fromPercentage: function(value){
                 return min*value + len*value;
             }
         }
