@@ -7,10 +7,10 @@ module.exports = {
                 if(len === 0)
                     return 0;
 
-                return (min/len + value/len);
+                return (min + value)/len;
             },
             fromPercentage: function(value){
-                return min*value + len*value;
+                return (min + len)*value;
             }
         }
     },
@@ -24,10 +24,10 @@ module.exports = {
                 if(value === 0)
                     return 0;
 
-                return (min/len + value/len);
+                return (min + value)/len;
             },
             fromPercentage: function(value){
-                return min*value + len*value;
+                return (min + len)*value;
             }
         }
     }
