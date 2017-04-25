@@ -1,79 +1,19 @@
 const synaptic = require('synaptic');
 const read = require('read-file');
 
+const mappings = require('./mappings');
+
 const Trainer = synaptic.Trainer,
     Architect = synaptic.Architect;
 
 
-function numericTransformer(min, max){
-  const len = (max-min);
 
-  return {
-    to: function(value){
-      if(len === 0)
-        return 0;
-
-      return (min/len + value/len);
-    },
-    from: function(value){
-      return min*value + len*value;
-    }
-  }
-}
-
-function stringTransformer(min, mappings){
-  const max = Object.keys(mappings).length;
-  const len = (max-min);
-
-  return {
-    to: function(value){
-      value = mappings[value.toLowerCase()];
-      if(value === 0)
-        return 0;
-
-      return (min/len + value/len);
-    },
-    from: function(value){
-      return min*value + len*value;
-    }
-  }
-}
-
-const makeMappings = {
-  'audi': 0
-};
-
-const fuelMappings = {
-  'd': 0,
-  'p': 1,
-  'c': 2
-};
-
-const colourMappings = {
-  'blue': 0,
-  'red': 1,
-  'green': 2,
-  'pink': 3
-};
-
-const MAPPINGS = {
-  'Price': new numericTransformer(0, 100000),
-  'Make': new stringTransformer(0, makeMappings),
-  'Age': new numericTransformer(0, 20),
-  'Mileage': new numericTransformer(0, 400000),
-  'Fuel': new stringTransformer(0, fuelMappings),
-  'Colour': new stringTransformer(0, colourMappings)
-}
+// = training using 'real' data transformed into Neural Network friendly values
 
 let data = read.sync('car-prices-mock.csv', {encoding: 'utf8'});
-
-
 data = data.split('\r\n');
 
-const headers = data[0].split(',');
-data.shift();
-
-
+const headers = data.shift().split(',');
 let training = [];
 
 for(let r=0; r<data.length; r++){
@@ -83,13 +23,17 @@ for(let r=0; r<data.length; r++){
   for(let c=1; c<headers.length; c++){
     let columnName = headers[c];
 
-    let mappedValue = MAPPINGS[columnName].to(dataRow[c]);
+    let mappedValue = mappings[columnName].to(dataRow[c]);
     
     trainingSet.push( mappedValue );
   }
 
-  training.push({input: trainingSet, output: [MAPPINGS['Price'].to(parseFloat(dataRow[0]))]});
+  training.push({input: trainingSet, output: [mappings['Price'].to(parseFloat(dataRow[0]))]});
 }
+
+// = end of training using 'real' data transformed into Neural Network friendly values
+
+// = machine learning using synaptic
 
 let network = new Architect.Perceptron(5, 3, 2, 1);
 let trainer = new Trainer(network);
@@ -103,25 +47,26 @@ trainer.train(training, {
 	cost: Trainer.cost.CROSS_ENTROPY
 });
 
-
+// = end of machine learning using synaptic
 
 // = actual evaluation
 
 let input = process.argv;
-input.shift();
-input.shift();
+input.shift(); // remove process name from the list
 
-if(input.length < Object.keys(MAPPINGS).length - 1)
-  throw('Not enough parameters!');
+if(input.length < Object.keys(mappings).length - 1)
+  throw('Not enough parameters to match the data!');
 
 
 for(i=1; i<headers.length; i++){  
   let columnName = headers[i];
-   input[i-1] = MAPPINGS[columnName].to(input[i-1]);
+  input[i] = mappings[columnName].to(input[i]);
 }
 
+input.shift(); // get rid off remaining command line argument
+
 let result = network.activate(input);
-result = MAPPINGS['Price'].from(result);
+result = mappings['Price'].from(result);
 
 console.log('');
 console.log('Your car is worth £' + parseInt(result));
