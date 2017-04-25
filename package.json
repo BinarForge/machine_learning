@@ -1,0 +1,15 @@
+{
+  "name": "machine-learning",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tests"
+  },
+  "author": "binarforge",
+  "license": "ISC",
+  "dependencies": {
+    "read-file": "^0.2.0",
+    "synaptic": "^1.0.10"
+  }
+}
