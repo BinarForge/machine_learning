@@ -11,7 +11,11 @@ const Trainer = synaptic.Trainer,
 // = training using 'real' data transformed into Neural Network friendly values
 
 let data = read.sync('car-prices-mock.csv', {encoding: 'utf8'});
-data = data.split('\r\n');
+
+if(data.indexOf('\r') === -1)
+  data = data.split('\n');
+else
+  data = data.split('\r\n');
 
 const headers = data.shift().split(',');
 let training = [];
